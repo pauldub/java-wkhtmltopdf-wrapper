@@ -20,66 +20,66 @@ public class Pdf implements PdfService {
 
     static final String STDOUT = "-";
 
-	private String command;
-	private List<Param> params;
-	private String htmlInput = null;
+    private String command;
+    private List<Param> params;
+    private String htmlInput = null;
     private boolean htmlFromString = false;
 
-	public Pdf(String wkhtmltopdf, List<Param> params) {
-		this.command = wkhtmltopdf;
-		this.params = params;
-	}
+    public Pdf(String wkhtmltopdf, List<Param> params) {
+        this.command = wkhtmltopdf;
+        this.params = params;
+    }
 
-	public Pdf(List<Param> params) {
-		this("wkhtmltopdf", params);
-	}
+    public Pdf(List<Param> params) {
+        this("wkhtmltopdf", params);
+    }
 
-	public Pdf(Param... params) {
-		this("wkhtmltopdf", Arrays.asList(params));
-	}
+    public Pdf(Param... params) {
+        this("wkhtmltopdf", Arrays.asList(params));
+    }
 
-	public Pdf() {
-		this("wkhtmltopdf", new ArrayList<Param>());
-	}
+    public Pdf() {
+        this("wkhtmltopdf", new ArrayList<Param>());
+    }
 
-	public void addHtmlInput(String input) {
+    public void addHtmlInput(String input) {
         this.htmlFromString = true;
         this.htmlInput = input;
-	}
+    }
 
-	/**
-	 * TODO Add a HTML file, a HTML string or a page from a URL
-	 */
-	public void addCover(String cover) {
-		// TODO Auto-generated method stub
-	}
+    /**
+     * TODO Add a HTML file, a HTML string or a page from a URL
+     */
+    public void addCover(String cover) {
+        // TODO Auto-generated method stub
+    }
 
-	/**
-	 * TODO just the TOC option from wkhtmltopdf
-	 */
-	public void addToc() {
-		// TODO Auto-generated method stub
-	}
+    /**
+     * TODO just the TOC option from wkhtmltopdf
+     */
+    public void addToc() {
+        // TODO Auto-generated method stub
+    }
 
-	public void addParam(Param param) {
-		params.add(param);
-	}
+    public void addParam(Param param) {
+        params.add(param);
+    }
 
-	public void addParam(Param... params) {
-		for (Param param : params) {
-			addParam(param);
-		}
-	}
+    public void addParam(Param... params) {
+        for (Param param : params) {
+            addParam(param);
+        }
+    }
 
-	/**
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	public File saveAs(String path) throws IOException, InterruptedException {
+    /**
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public File saveAs(String path) throws IOException, InterruptedException {
         File file = new File(path);
         getPDF(path);
         return file;
-	}
+    }
 
     public File saveAs(String path, byte[] document) throws IOException {
         File file = new File(path);
@@ -139,17 +139,17 @@ public class Pdf implements PdfService {
         return getPDF(STDOUT);
     }
 
-	public String commandWithParameters() {
-		StringBuilder sb = new StringBuilder();
-		for (Param param : params) {
-			sb.append(param);
-		}
+    public String commandWithParameters() {
+        StringBuilder sb = new StringBuilder();
+        for (Param param : params) {
+            sb.append(param);
+        }
 
-		return command + sb.toString();
-	}
+        return command + sb.toString();
+    }
 
-	public void addParam(GlobalOption option) {
-		addParam(new Param(option.toString()));
-	}
+    public void addParam(GlobalOption option) {
+        addParam(new Param(option.toString()));
+    }
 
 }
