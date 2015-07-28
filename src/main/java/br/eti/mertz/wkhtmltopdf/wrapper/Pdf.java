@@ -1,12 +1,19 @@
 package br.eti.mertz.wkhtmltopdf.wrapper;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import br.eti.mertz.wkhtmltopdf.wrapper.options.GlobalOption;
 import lombok.Data;
+
+import br.eti.mertz.wkhtmltopdf.wrapper.options.GlobalOption;
 
 @Data
 public class Pdf implements PdfService {
@@ -90,13 +97,21 @@ public class Pdf implements PdfService {
         if(htmlFromString && !this.params.contains(new Param("-"))) {
             this.addParam(new Param("-"));
         }
-        String command = this.commandWithParameters() + Symbol.separator + path;
-        Process process = runtime.exec(command);
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        for(Param p : params) {
+            pb.command().add(p.toString());
+        }
+        pb.command().add(path);
+
+        Process process = pb.start();
+
         if(htmlFromString) {
             OutputStream stdInStream = process.getOutputStream();
             stdInStream.write(htmlInput.getBytes("UTF-8"));
             stdInStream.close();
         }
+
         InputStream stdOutStream = process.getInputStream();
         InputStream stdErrStream = process.getErrorStream();
         process.waitFor();
