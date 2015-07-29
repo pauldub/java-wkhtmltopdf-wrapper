@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import lombok.Data;
 
@@ -17,6 +18,8 @@ import br.eti.mertz.wkhtmltopdf.wrapper.options.GlobalOption;
 
 @Data
 public class Pdf implements PdfService {
+    private static final Logger log = Logger.getLogger(Pdf.class.getName());
+
 
     static final String STDOUT = "-";
 
@@ -98,13 +101,24 @@ public class Pdf implements PdfService {
             this.addParam(new Param("-"));
         }
 
-        ProcessBuilder pb = new ProcessBuilder(command);
-        for(Param p : params) {
-            pb.command().add(p.toString());
-        }
-        pb.command().add(path);
+        List<String> commandLine = new ArrayList<String>();
 
-        Process process = pb.start();
+        commandLine.add(command);
+        for(Param p : params) {
+            commandLine.add(p.getKey());
+
+            String value = p.getValue();
+
+            if(value != null) {
+                commandLine.add(p.getValue());
+            }
+        }
+
+        commandLine.add(path);
+
+        log.info("Starting process with command: " + commandLine.toString());
+
+        Process process = runtime.exec(commandLine.toArray(new String[commandLine.size()]));
 
         if(htmlFromString) {
             OutputStream stdInStream = process.getOutputStream();
@@ -114,6 +128,7 @@ public class Pdf implements PdfService {
 
         InputStream stdOutStream = process.getInputStream();
         InputStream stdErrStream = process.getErrorStream();
+
         process.waitFor();
 
         ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
@@ -122,10 +137,12 @@ public class Pdf implements PdfService {
         while(stdOutStream.available()>0) {
             stdOut.write((char) stdOutStream.read());
         }
+
         stdOutStream.close();
         while(stdErrStream.available()>0) {
             stdErr.write((char) stdErrStream.read());
         }
+
         stdErrStream.close();
 
         if(process.exitValue() != 0) {
